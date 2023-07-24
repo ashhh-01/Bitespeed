@@ -2,24 +2,41 @@ const express= require("express")
 const app=express()
 const bodyParser=require("body-parser")
 let mysql = require('mysql2');
-const path=require("path")
-
+if(process.env.NODE_ENV!=="production"){
+  require("dotenv").config()
+}
 let pool = mysql.createPool({
   connectionLimit: 10,
   host: "localhost",
   user: "root",
   password:process.env.MYSQLPASSWORD,
-  database:process.env.MYSQLDB
+  database:"backend",
 });
+
+// const db=mysql.createConnection({
+//   connectionLimit: 10,
+//   host: "bitespeed-inst.cn1pnc1h79p2.ap-south-1.rds.amazonaws.com",
+//   user: "admin",
+//   password:"Ashrithmr2001",
+//   database:"bitespeed",
+//   port:"3306"
+// })
+
+// db.connect((err)=>{
+//   if(err){
+//     console.log(err.message)
+//     return 
+//   }
+//   console.log("connected")
+
+// })
 
 pool.getConnection(function(err, connection) {
   if (err) {
     console.error("Error connecting to MySQL:", err.message);
-    process.exit(1); // Exit the application with a non-zero code
+    process.exit(1); 
   }
   console.log("Connected!");
-  // Do database operations using the "connection" object
-  // Release the connection when done: connection.release();
 });
 app.set('view engine', 'ejs');
 
@@ -33,11 +50,34 @@ app.use(bodyParser.urlencoded({
 app.get("/",(req,res)=>{
     res.render("index")
 })
-app.post("/identify",(req,res)=>{
-    const {email,phoneNumber,createdAt,updateAt}=req.body
-    // const sql = "INSERT INTO bitespeed (email, username) VALUES ('${name}', '${username}')";
-})
+app.post("/identify",async(req,res)=>{
+    const {email,phoneNumber,createdAt,updatedAt}=req.body
+    
+        const findSql = `SELECT * FROM bitespeed WHERE email ="${email}"`;
+        pool.query(findSql, [email], (err, result) => {
+            console.log(pool)
+            if (err) {
+            console.error('Error fetching data from MySQL:', err);
+            return res.status(500).json({ error: 'Error fetching data from MySQL' });
+          }
+          if (result.length === 0) {
+            const insertSql = `INSERT INTO bitespeed (email, phoneNumber, createdAt, updatedAt) VALUES ('${email}','${phoneNumber}', '${createdAt}','${updatedAt}')`;
+            const insertValues=[email,phoneNumber,createdAt,updatedAt]
+            pool.query(insertSql, insertValues, (err, insertedResult) => {
+              if (err) {
+                console.error('Error inserting data into MySQL:', err);
+                return res.status(500).json({ error: 'Error inserting data into MySQL' });
+              }
+              pool.query(findSql, [email], (err, result) => {
+                res.json(result)
+              })
+        })}else{
+          res.json({results:result });
+        }
+        })
+    });
 
-app.listen(3000,()=>{
+const PORT=process.env.PORT ||3000
+app.listen(PORT,()=>{
     console.log("Listening on port 3000")
 })
