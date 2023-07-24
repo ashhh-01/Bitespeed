@@ -5,14 +5,25 @@ let mysql = require('mysql2');
 if(process.env.NODE_ENV!=="production"){
   require("dotenv").config()
 }
+// let pool = mysql.createPool({
+//   connectionLimit: 10,
+//   host: "localhost",
+//   user: "root",
+//   password:"ashrithmr@2001",
+//   database:"backend",
+// });
+
+
 let pool = mysql.createPool({
   connectionLimit: 10,
-  host: "localhost",
-  user: "root",
-  password:process.env.MYSQLPASSWORD,
-  database:"backend",
-});
+  host: process.env.AWSENDPOINT,
+  user: "admin",
+  password:process.env.AWSPASSWORD,
+  database:"bitespeed",
+  port:"3306",
+  connectTimeout: 15000, 
 
+});
 // const db=mysql.createConnection({
 //   connectionLimit: 10,
 //   host: "bitespeed-inst.cn1pnc1h79p2.ap-south-1.rds.amazonaws.com",
@@ -61,7 +72,7 @@ app.post("/identify",async(req,res)=>{
             return res.status(500).json({ error: 'Error fetching data from MySQL' });
           }
           if (result.length === 0) {
-            const insertSql = `INSERT INTO bitespeed (email, phoneNumber, createdAt, updatedAt) VALUES ('${email}','${phoneNumber}', '${createdAt}','${updatedAt}')`;
+            const insertSql = `INSERT INTO bitespeed (email, phoneNumber,linkPrecedence, createdAt, updatedAt) VALUES ('${email}','${phoneNumber}',"primary" ,'${createdAt}','${updatedAt}')`;
             const insertValues=[email,phoneNumber,createdAt,updatedAt]
             pool.query(insertSql, insertValues, (err, insertedResult) => {
               if (err) {
@@ -72,7 +83,7 @@ app.post("/identify",async(req,res)=>{
                 res.json(result)
               })
         })}else{
-          res.json({results:result });
+          res.json({result });
         }
         })
     });
