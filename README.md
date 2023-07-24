@@ -1,4 +1,5 @@
 <h1>Bitespeed Backend Task: Identity Reconciliation</h1>
+<hr>
 <h2>Overview</h2>
 <p>This is backend Node.js application built using Express framework and AWS RDS (Amazon Relational Database Service) as the MySQL server. The purpose of this project is to perform identity reconciliation, where incoming data in JSON format is received, processed, and stored in the SQL Database. Additionally, the application allows for retrieving data associated with a specific email address.</p>
 
@@ -22,6 +23,7 @@ The <code>bitespeed</code> table in the AWS RDS MySQL database is used to store 
 <li>updatedAt: A VARCHAR(255) Column</li>
 <li>deletedAt: A VARCHAR(255) Column </li>
 </ol>
+<hr>
 <h6>Input</h6>
 ```
 Email: 1@gmail.com
@@ -32,6 +34,7 @@ PhoneNumber:123456
 ```
 [{"id":4,"phoneNumber":"123456","email":"1@gmail.com","linkedId":null,"linkPrecedence":"primary","createdAt":"7/24/2023, 9:49:01 PM","updatedAt":"7/24/2023, 9:49:01 PM","deletedAt":null}]
 ```
+<hr>
 <p>Please find below the task link</p>
 <a href="https://bitespeed-6pje.onrender.com/">Task Link</a>
 
