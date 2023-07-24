@@ -2,21 +2,14 @@ const express= require("express")
 const app=express()
 const bodyParser=require("body-parser")
 let mysql = require('mysql2');
-if(process.env.NODE_ENV!=="production"){
-  require("dotenv").config()
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
 }
-// let pool = mysql.createPool({
-//   connectionLimit: 10,
-//   host: "localhost",
-//   user: "root",
-//   password:"ashrithmr@2001",
-//   database:"backend",
-// });
 
 
 let pool = mysql.createPool({
   connectionLimit: 10,
-  host: process.env.AWSENDPOINT,
+  host:process.env.AWSENDPOINT,
   user: "admin",
   password:process.env.AWSPASSWORD,
   database:"bitespeed",
@@ -24,23 +17,7 @@ let pool = mysql.createPool({
   connectTimeout: 15000, 
 
 });
-// const db=mysql.createConnection({
-//   connectionLimit: 10,
-//   host: "bitespeed-inst.cn1pnc1h79p2.ap-south-1.rds.amazonaws.com",
-//   user: "admin",
-//   password:"Ashrithmr2001",
-//   database:"bitespeed",
-//   port:"3306"
-// })
 
-// db.connect((err)=>{
-//   if(err){
-//     console.log(err.message)
-//     return 
-//   }
-//   console.log("connected")
-
-// })
 
 pool.getConnection(function(err, connection) {
   if (err) {
