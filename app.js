@@ -57,6 +57,29 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
  }))
+//To create a table
+//  const tabledb = `
+//  CREATE TABLE bitespeeds (
+//    id int NOT NULL AUTO_INCREMENT,
+//    phoneNumber varchar(255) DEFAULT NULL,
+//    email varchar(255) DEFAULT NULL,
+//    linkedId int DEFAULT NULL,
+//    linkPrecedence varchar(255) DEFAULT NULL,
+//    createdAt varchar(255) DEFAULT NULL,
+//    updatedAt varchar(255) DEFAULT NULL,
+//    deletedAt varchar(255) DEFAULT NULL,
+//    PRIMARY KEY (id)
+//  )
+// `;
+// pool.query(tabledb, (err, result) => {
+//   if (err) {
+//     console.error('Error creating table:', err);
+//   } else {
+//     console.log('Table created successfully');
+//   }
+//   pool.end();
+// });
+
 
 app.get("/",(req,res)=>{
     res.render("index")
