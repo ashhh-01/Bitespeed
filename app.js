@@ -65,17 +65,21 @@ app.get("/",(req,res)=>{
 app.get("/identify",(req,res)=>{
   const getQuery='SELECT * FROM bitespeed'
   pool.query(getQuery,(err,result)=>{
-    console.log(result)
+    // console.log(result)
     res.send(result)
   })
 })
 
 app.post("/identify",(req,res)=>{
-    const {email,phoneNumber,createdAt,updatedAt}=req.body
+    // const {email,phoneNumber,createdAt,updatedAt}=req.body
+    const {email,phoneNumber}=req.body
     const findEmailOrPhoneSql = `SELECT * FROM bitespeed WHERE email = "${email}" OR phoneNumber = "${phoneNumber}"`;
+    const createdAt = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const updatedAt = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+
     pool.query(findEmailOrPhoneSql, [email], (err, result) => {
       if (err) {
-        console.error('Error fetching data from MySQL:', err);
+        // console.error('Error fetching data from MySQL:', err);
         return res.status(500).json({ error: 'Error fetching data from MySQL' });
         }
         if (result.length === 0) {
@@ -84,7 +88,7 @@ app.post("/identify",(req,res)=>{
           const insertValues=[email,phoneNumber,createdAt,updatedAt]
           pool.query(insertSql, insertValues, (err, insertedResult) => {
             if (err) {
-              console.error('Error inserting data into MySQL:', err);
+              // console.error('Error inserting data into MySQL:', err);
               return res.status(500).json({ error: 'Error inserting data into MySQL' });
               }
               // This will print the newely entered data
@@ -98,7 +102,7 @@ app.post("/identify",(req,res)=>{
           const insertaddValues=[email,phoneNumber,exisitingDataId,"Secondary",createdAt,updatedAt]
           pool.query(insertExist, insertaddValues, (err, insertedResult) => {
           if (err) {
-            console.error('Error inserting data into MySQL:', err);
+            // console.error('Error inserting data into MySQL:', err);
             return res.status(500).json({ error: 'Error inserting data into MySQL' });
             }
             pool.query(findEmailOrPhoneSql, [email], (err, result) => {
@@ -145,5 +149,5 @@ app.post("/identify",(req,res)=>{
 
 const PORT=process.env.PORT ||3000
 app.listen(PORT,()=>{
-    console.log("Listening on port 3000")
+    console.log(`Listening on port ${PORT}`)
 })
