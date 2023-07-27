@@ -58,17 +58,61 @@ app.use(bodyParser.urlencoded({
 // });
 
 
-// app.get("/",(req,res)=>{
-//     res.render("index")
-// })
+app.get("/",(req,res)=>{
+    res.render("index")
+})
 
-// app.get("/identify",(req,res)=>{
-//   const getQuery='SELECT * FROM bitspeeds'
-//   pool.query(getQuery,(err,result)=>{
-//     console.log(result)
-//     res.send(result)
-//   })
-// })
+app.get("/identify",(req,res)=>{
+  const getQuery='SELECT * FROM bitespeed'
+  pool.query(getQuery,(err,result)=>{
+    console.log(result)
+    res.send(result)
+  })
+})
+
+app.post("/identify",(req,res)=>{
+    const {email,phoneNumber,createdAt,updatedAt}=req.body
+    const findEmailOrPhoneSql = `SELECT * FROM bitespeed WHERE email = "${email}" OR phoneNumber = "${phoneNumber}"`;
+    pool.query(findEmailOrPhoneSql, [email], (err, result) => {
+      if (err) {
+        console.error('Error fetching data from MySQL:', err);
+        return res.status(500).json({ error: 'Error fetching data from MySQL' });
+        }
+        if (result.length === 0) {
+          //This block will insert the data because it doesnt exist
+          const insertSql = `INSERT INTO bitespeed (email, phoneNumber,linkPrecedence, createdAt, updatedAt) VALUES ('${email}','${phoneNumber}',"primary" ,'${createdAt}','${updatedAt}')`;
+          const insertValues=[email,phoneNumber,createdAt,updatedAt]
+          pool.query(insertSql, insertValues, (err, insertedResult) => {
+            if (err) {
+              console.error('Error inserting data into MySQL:', err);
+              return res.status(500).json({ error: 'Error inserting data into MySQL' });
+              }
+              // This will print the newely entered data
+              pool.query(findEmailOrPhoneSql, [email], (err, result) => {
+                res.json(result)
+              })
+         })}else{
+          //So it does exist
+          const exisitingDataId=result[0]["id"]
+          const insertExist = `INSERT INTO bitespeed (email, phoneNumber,linkedId,linkPrecedence, createdAt, updatedAt) VALUES ('${email}','${phoneNumber}','${exisitingDataId}','Secondary' ,'${createdAt}','${updatedAt}')`;
+          const insertaddValues=[email,phoneNumber,exisitingDataId,"Secondary",createdAt,updatedAt]
+          pool.query(insertExist, insertaddValues, (err, insertedResult) => {
+          if (err) {
+            console.error('Error inserting data into MySQL:', err);
+            return res.status(500).json({ error: 'Error inserting data into MySQL' });
+            }
+            pool.query(findEmailOrPhoneSql, [email], (err, result) => {
+            res.json(result)
+
+            })
+            
+
+        })
+        }})
+    });
+
+
+
 // app.post("/identify",async(req,res)=>{
 //     const {email,phoneNumber,createdAt,updatedAt}=req.body
     
@@ -79,6 +123,7 @@ app.use(bodyParser.urlencoded({
 //             return res.status(500).json({ error: 'Error fetching data from MySQL' });
 //           }
 //           if (result.length === 0) {
+//             //This block will insert the data because it doesnt exist
 //             const insertSql = `INSERT INTO bitespeed (email, phoneNumber,linkPrecedence, createdAt, updatedAt) VALUES ('${email}','${phoneNumber}',"primary" ,'${createdAt}','${updatedAt}')`;
 //             const insertValues=[email,phoneNumber,createdAt,updatedAt]
 //             pool.query(insertSql, insertValues, (err, insertedResult) => {
@@ -86,6 +131,7 @@ app.use(bodyParser.urlencoded({
 //                 console.error('Error inserting data into MySQL:', err);
 //                 return res.status(500).json({ error: 'Error inserting data into MySQL' });
 //               }
+//               // This will print the newely entered data
 //               pool.query(findSql, [email], (err, result) => {
 //                 res.json(result)
 //               })
